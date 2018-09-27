@@ -22,7 +22,7 @@ Write-Output "Installing necessary module(s)"
   $moduleName = $moduleArgs.Name
 
   Write-Output "Checking for ${moduleName}"
-  $existing = Get-InstalledModule @moduleArgs
+  $existing = Get-InstalledModule @moduleArgs -ErrorAction SilentlyContinue
   If (!$existing) {
     Write-Output "Installing/Importing ${moduleName}"
     Install-Module @moduleArgs -SkipPublisherCheck -Force
