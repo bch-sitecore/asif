@@ -1,1 +1,3 @@
 dist/
+resourcefiles/*.ps1
+resourcefiles/*.json

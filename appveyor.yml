@@ -1,8 +1,39 @@
 version: 0.1.{build}
 image: Visual Studio 2017
 
+environment:
+  license_url:
+    secure: niAprUCDiG+obOLNs9BnCEaFLb3zIrGVzqg2Xn6NxudI7DoleHWlDhK6a69722jpUy1cby3iqb7hhgtG54TQLg6Eod0VMw2RZySU+cac5qsEKvwJIfUVdI/ffRVpAkblNYUrMXTfKEZ37kwHQZ47nmc1Wjdx3kC92Jdg5WinTzssxCqPZvvcNNBhGgpY3vSjxpH6bPXf31KYxJn2XnOatipXUsdAdyhUX1wauegINFB31yWR2cRpCh7sQ+/VfY1cGXwlF4gtl0VTk2yUlykdGw==
+  packages_url:
+    secure: niAprUCDiG+obOLNs9BnCEaFLb3zIrGVzqg2Xn6NxudI7DoleHWlDhK6a69722jp0sAZ0QYwQtlsrvGWGEqxUKDMJ/FGpzW3rOWpNs4rqOF8eLWp5o7w5aLGrQWwxohElYMvWPU2LryV2EQaLvG7zoAuK3UX+lDJfYr5xTrMRXfcp/nCG+z+z8m5cb5QeKR7JU2yPXQ4ZLeaR11hbmc1Rt8Xns5Bf2sCQzduxuv0bll1398Qh9uQYVEgG3bwZtMILy6Dxxt6r4+PktowbXj1qcdsQRTd8UBK71Y9gorDf8fer3NKEsyW2g7eTPlDJ+vocNX78K0I3aHYMlCoTK1oOQ==
+
+cache:
+  - resourcesfiles -> appveyor.yml
+
 install:
   - ps: .\Setup.ps1
+  - ps: |
+      $resx = ".\resourcefiles"
+      If (!(Test-Path $rex)) {
+        New-Item $resx -ItemType Directory | Out-Null
+      }
+      If (!(Test-Path "$resx\license.xml")) {
+        Invoke-WebRequest $env:license_url -OutFile "$resc\license.xml"
+      }
+      If (!(Test-Path "$resx\Sitecore*(WDP XP0 packages).zip")) {
+        Invoke-WebRequest $env:packages_url -OutFile "$resx\Sitecore (WDP XP0 packages).zip"
+      }
+      If (
+        !(Test-Path "$resx\*(OnPrem)_single.scwdp.zip") -or
+        !(Test-Path "$resx\*(OnPrem)_xp0xconnect.scwdp.zip") -or
+        !(Test-Path "$resx\XP0 Configuration files*.zip")
+      ) {
+        Expand-Archive "$resx\Sitecore (WDP XP0 packages).zip" -DestinationPath $resx\
+      }
+      If (!(Test-Path "$resx\*.json")) {
+        Expand-Archive "$resx\XP0 Configuration files*.zip" -DestinationPath $resx\
+      }
 
-build_script:
-  - ps: .\Build.ps1
+build: false
+#build_script:
+#  - ps: .\Build.ps1
