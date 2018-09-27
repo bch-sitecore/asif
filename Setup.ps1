@@ -16,7 +16,6 @@ Write-Output "Installing necessary module(s)"
   @{ Name = "Pester";           MinimumVersion = [version]"4.4" }
   @{ Name = "PSScriptAnalyzer"; MinimumVersion = [version]"1.17" }
   @{ Name = "PowerShellGet";    MinimumVersion = [version]"1.6" }
-  @{ Name = "SqlServer";        MinimumVersion = [version]"21.0.17279" }
 ) | ForEach-Object {
   $moduleArgs = $_
   $moduleName = $moduleArgs.Name
