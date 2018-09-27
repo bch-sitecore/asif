@@ -1,0 +1,28 @@
+// ------------------------------------------------------------------------- //
+//              Sitecore Install Framework - XP0 Configuration               //
+//                                                                           //
+// Run this configuration to install the necessary prerequisites to install  //
+// a single instance of Sitecore.                                            //
+// ------------------------------------------------------------------------- //
+{
+  "Parameters": {
+    "Name": {
+      "Type": "string",
+      "DefaultValue": "world",
+      "Description": "Greet the world"
+    }
+  },
+  "Variables": {
+  },
+  "Tasks": {
+    "SayHello": {
+      "Type": "Greet",
+      "Params": {
+        "Name": "[parameter('Name')]"
+      }
+    }
+  },
+  "Modules": [
+    ".\\Module.ASIF.ps1"
+  ]
+}

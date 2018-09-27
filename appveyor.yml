@@ -1,0 +1,8 @@
+version: 0.1.{build}
+image: Microsoft Visual Studio 2017
+
+install:
+  - ps: .\Setup.ps1
+
+build_script:
+  - ps: .\Build.ps1
