@@ -15,14 +15,56 @@
   "Variables": {
   },
   "Tasks": {
-    "SayHello": {
-      "Type": "Greet",
-      "Params": {
-        "Name": "[parameter('Name')]"
-      }
+    "InstallSqlServer": {
+      "Type": "SqlServerDeveloper",
+      "Params": {}
+    },
+    "InstallSqlContainedDbAuth": {
+      "Type": "SqlContainedDbAuth",
+      "Params": {}
+    },
+    "InstallJavaRuntimeEnvironment": {
+      "Type": "JavaSE8",
+      "Params": {}
+    },
+    "InstallNssm": {
+      "Type": "NSSM",
+      "Params": {}
+    },
+    "InstallSolr": {
+      "Type": "SOLR",
+      "Params": {}
+    },
+    "InstallWebServer": {
+      "Type": "WebServer",
+      "Params": {}
+    },
+    "InstallWebDeployModule": {
+      "Type": "WebDeployModule",
+      "Params": {}
+    },
+    "InstallURLRewriteModule": {
+      "Type": "URLRewriteModule",
+      "Params": {}
+    },
+    "InstallVC2015Redist": {
+      "Type": "VC15Redist",
+      "Params": {}
+    },
+    //"InstallVC2017Redist": {
+    //  "Type": "VC17Redist",
+    //  "Params": {}
+    //},
+    "InstallSQLSysClrTypes": {
+      "Type": "SQLSysClrTypes",
+      "Params": {}
+    },
+    "InstallDacFx": {
+      "Type": "DacFx",
+      "Params": {}
     }
   },
   "Modules": [
-    ".\\Module.ASIF.ps1"
+    ".\\SIF.Extension.ASIF.ps1"
   ]
 }

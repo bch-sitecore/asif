@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 
 $src = Join-Path $PSScriptRoot -ChildPath "src"
 $dist = Join-Path $PSScriptRoot -ChildPath "dist"
-$output = Join-Path $dist -ChildPath "Module.ASIF.ps1"
+$output = Join-Path $dist -ChildPath "SIF.Extension.ASIF.ps1"
 
 Write-Output "Cleaning ${dist}"
 If (Test-Path $dist) {
