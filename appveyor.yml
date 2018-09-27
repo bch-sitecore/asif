@@ -14,7 +14,7 @@ install:
   - ps: .\Setup.ps1
   - ps: |
       $resx = ".\resourcefiles"
-      If (!(Test-Path $rex)) {
+      If (!(Test-Path $resx)) {
         Write-Output "Creating $resx"
         New-Item $resx -ItemType Directory | Out-Null
       }
