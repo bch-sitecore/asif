@@ -15,12 +15,15 @@ install:
   - ps: |
       $resx = ".\resourcefiles"
       If (!(Test-Path $rex)) {
+        Write-Output "Creating $resx"
         New-Item $resx -ItemType Directory | Out-Null
       }
       If (!(Test-Path "$resx\license.xml")) {
+        Write-Output "Downloading license"
         Invoke-WebRequest $env:license_url -OutFile "$resc\license.xml"
       }
       If (!(Test-Path "$resx\Sitecore*(WDP XP0 packages).zip")) {
+        Write-Output "Downloading packages"
         Invoke-WebRequest $env:packages_url -OutFile "$resx\Sitecore (WDP XP0 packages).zip"
       }
       If (
@@ -28,9 +31,11 @@ install:
         !(Test-Path "$resx\*(OnPrem)_xp0xconnect.scwdp.zip") -or
         !(Test-Path "$resx\XP0 Configuration files*.zip")
       ) {
+        Write-Output "Extracting packages"
         Expand-Archive "$resx\Sitecore (WDP XP0 packages).zip" -DestinationPath $resx\
       }
       If (!(Test-Path "$resx\*.json")) {
+        Write-Output "Extracting configuration files"
         Expand-Archive "$resx\XP0 Configuration files*.zip" -DestinationPath $resx\
       }
 
