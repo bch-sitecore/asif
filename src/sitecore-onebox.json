@@ -16,14 +16,14 @@
       "DefaultValue": "c:\\resourcefiles\\license.xml",
       "Description": "Path to license.xml"
     },
-    "SitecoreDeveloperPassword": {
-      "Type": "string",
-      "Description": "Password for dev.sitecore.net"
-    },
-    "SitecoreDeveloperUsername": {
-      "Type": "string",
-      "Description": "Username for dev.sitecore.net"
-    },
+    // "SitecoreDeveloperPassword": {
+    //   "Type": "string",
+    //   "Description": "Password for dev.sitecore.net"
+    // },
+    // "SitecoreDeveloperUsername": {
+    //   "Type": "string",
+    //   "Description": "Username for dev.sitecore.net"
+    // },
     "SitecorePrefix": {
       "Type": "string",
       "DefaultValue": "xp0",
@@ -76,6 +76,79 @@
     "XConnectCollectionService": "[concat(parameter('SitecorePrefix'), '.xconnect')]"
   },
   "Tasks": {
+    "InstallSqlServer": {
+      "Type": "SqlServerDeveloper",
+      "Params": {
+        "AdminPassword": "[parameter('SqlAdminPassword')]"
+      }
+    },
+    "InstallSqlServerModule": {
+      "Type": "SqlServerModule",
+      "Params": {}
+    },
+    "InstallSqlContainedDbAuth": {
+      "Type": "SqlContainedDbAuth",
+      "Params": {
+        "AdminPassword": "[parameter('SqlAdminPassword')]",
+        "AdminUsername": "[parameter('SqlAdminUsername')]",
+        "ServerInstance": "[parameter('SqlServer')]"
+      }
+    },
+    "InstallJavaRuntimeEnvironment": {
+      "Type": "JavaSE8",
+      "Params": {}
+    },
+    "InstallNssm": {
+      "Type": "NSSM",
+      "Params": {}
+    },
+    "InstallSolr": {
+      "Type": "SOLR",
+      "Params": {
+        "Hostname": "[parameter('SolrHostname')]",
+        "Port": "[parameter('SolrPort')]",
+        "Version": "[parameter('SolrVersion')]",
+        "ServiceName": "[parameter('SolrServiceName')]",
+        "CertificateFriendlyName": "[parameter('SolrCertFriendlyName')]"
+      }
+    },
+    "InstallWebServer": {
+      "Type": "WebServer",
+      "Params": {}
+    },
+    "InstallWebDeployModule": {
+      "Type": "WebDeployModule",
+      "Params": {}
+    },
+    "InstallURLRewriteModule": {
+      "Type": "URLRewriteModule",
+      "Params": {}
+    },
+    "InstallVC2015Redist": {
+      "Type": "VC15Redist",
+      "Params": {}
+    },
+    "InstallSQLSysClrTypes": {
+      "Type": "SQLSysClrTypes",
+      "Params": {}
+    },
+    "InstallDacFx": {
+      "Type": "DacFx",
+      "Params": {}
+    },
+    // "DownloadSitecorePackages": {
+    //   "Type": "DownloadSitecore",
+    //   "Params": {
+    //     "SitecoreUsername": "[parameter('SitecoreDeveloperUsername')]",
+    //     "SitecorePassword": "[parameter('SitecoreDeveloperPassword')]",
+    //     "Sources": {
+    //       "Sitecore 9.0.2 rev. 180604 (WDP XP0 packages).zip": "https://dev.sitecore.net/~/media/F53E9734518E47EF892AD40A333B9426.ashx"
+    //     },
+    //     "Destination": "[parameter('ResourcePath')]"
+    //   }
+    // },
+    // TODO Extract above zip
+    // TODO extract configuration zip from contents of above zip
     "InstallSitecoreXp0": {
       "Type": "SitecoreXP0",
       "Params": {
