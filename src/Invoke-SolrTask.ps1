@@ -1,6 +1,5 @@
 Function Invoke-SolrTask {
   [CmdletBinding(SupportsShouldProcess = $true)]
-  [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")]
   Param(
     [Parameter()]
     [ValidateNotNullOrEmpty()]
@@ -68,6 +67,7 @@ Register-SitecoreInstallExtension -Command Invoke-SolrTask -As Solr -Type Task
 
 Function NewSolrConfig {
   [CmdletBinding(SupportsShouldProcess = $true)]
+  [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")]
   Param(
     [Parameter(Position = 0, Mandatory = $true)]
     [ValidateScript({ Test-Path $_ -PathType Container })]
