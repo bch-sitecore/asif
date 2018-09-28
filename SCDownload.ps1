@@ -33,7 +33,6 @@ If (!$loginResponse -or $loginResponse.StatusCode -ne 200) {
   Write-Error "Unable to login to dev.sitecore.net with the supplied credentials"
 }
 
-$outFile = Join-Path $Destination -ChildPath $package.FileName
 If ($AllowClobber -or !(Test-Path $outFile)) {
   Invoke-WebRequest $Uri -OutFile $outFile -WebSession $scSession -UseBasicParsing
 } ElseIf (!$AllowClobber) {
