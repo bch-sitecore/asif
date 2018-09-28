@@ -3,13 +3,11 @@ ARG BASEIMAGE
 FROM ${BASEIMAGE}
 SHELL ["powershell", "-Command", "$ErrorActionPreference='Stop';$ProgressPreference='SilentlyContinue';"]
 
-ARG SitecoreDevUsername
-ARG SitecoreDevPassword
+# ARG SitecoreDevUsername
+# ARG SitecoreDevPassword
 COPY . /
 WORKDIR /resourcefiles
 RUN Install-SitecoreConfiguration `
-      -Path .\sitecore-onebox.json `
-      -SitecoreDeveloperUsername $env:SitecoreDevUsername `
-      -SitecoreDeveloperPassword $env:SitecoreDevPassword
+      -Path .\sitecore-onebox.json
 
 ENTRYPOINT ["powershell"]

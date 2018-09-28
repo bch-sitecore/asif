@@ -12,8 +12,6 @@ environment:
     secure: O31RyxMbW2kjUIZnmwAlIyGjRR7WCzzvWxCs9kL8mrg=
   license_url:
     secure: niAprUCDiG+obOLNs9BnCEaFLb3zIrGVzqg2Xn6NxudI7DoleHWlDhK6a69722jpUy1cby3iqb7hhgtG54TQLg6Eod0VMw2RZySU+cac5qsEKvwJIfUVdI/ffRVpAkblNYUrMXTfKEZ37kwHQZ47nmc1Wjdx3kC92Jdg5WinTzssxCqPZvvcNNBhGgpY3vSjxpH6bPXf31KYxJn2XnOatipXUsdAdyhUX1wauegINFB31yWR2cRpCh7sQ+/VfY1cGXwlF4gtl0VTk2yUlykdGw==
-  packages_url:
-    secure: niAprUCDiG+obOLNs9BnCEaFLb3zIrGVzqg2Xn6NxudI7DoleHWlDhK6a69722jp0sAZ0QYwQtlsrvGWGEqxUKDMJ/FGpzW3rOWpNs4rqOF8eLWp5o7w5aLGrQWwxohElYMvWPU2LryV2EQaLvG7zoAuK3UX+lDJfYr5xTrMRXfcp/nCG+z+z8m5cb5QeKR7JU2yPXQ4ZLeaR11hbmc1Rt8Xns5Bf2sCQzduxuv0bll1398Qh9uQYVEgG3bwZtMILy6Dxxt6r4+PktowbXj1qcdsQRTd8UBK71Y9gorDf8fer3NKEsyW2g7eTPlDJ+vocNX78K0I3aHYMlCoTK1oOQ==
   sitecore_username:
     secure: uLbUPi0gLKEHi8f75ysLMczdR6Sl0oU025K59LRfM6o=
   sitecore_password:
@@ -36,7 +34,10 @@ install:
       }
       If (!(Test-Path "$resx\Sitecore*(WDP XP0 packages).zip")) {
         Write-Output "Downloading packages"
-        Invoke-WebRequest $env:packages_url -OutFile "$resx\Sitecore (WDP XP0 packages).zip"
+        .\SCDownload.ps1 -Username $env:sitecore_username -Password $env:sitecore_password `
+          -Uri "https://dev.sitecore.net/~/media/F53E9734518E47EF892AD40A333B9426.ashx" `
+          -OutFile "$resx\Sitecore (WDP XP0 packages).zip"
+        #Invoke-WebRequest $env:packages_url -OutFile "$resx\Sitecore (WDP XP0 packages).zip"
       }
       If (
         !(Test-Path "$resx\*(OnPrem)_single.scwdp.zip") -or
@@ -54,5 +55,4 @@ install:
 build_script:
   - ps: |
       $env:docker_password | docker login --username $env:docker_username --password-stdin $env:docker_organization
-      .\Build.ps1 -SitecoreDevUsername $env:sitecore_username -SitecoreDevPassword $env:sitecore_password `
-        -Repository $env:docker_repository -Publish
+      .\Build.ps1 -Repository $env:docker_repository -Publish

@@ -1,13 +1,13 @@
 [CmdletBinding()]
 Param(
-  [Parameter(Mandatory = $true)]
-  [ValidateNotNullOrEmpty()]
-  [string]$SitecoreDevUsername
-  ,
-  [Parameter(Mandatory = $true)]
-  [ValidateNotNullOrEmpty()]
-  [string]$SitecoreDevPassword
-  ,
+  # [Parameter(Mandatory = $true)]
+  # [ValidateNotNullOrEmpty()]
+  # [string]$SitecoreDevUsername
+  # ,
+  # [Parameter(Mandatory = $true)]
+  # [ValidateNotNullOrEmpty()]
+  # [string]$SitecoreDevPassword
+  # ,
   [Parameter()]
   [string]$Repository = "asif"
   ,
@@ -70,18 +70,14 @@ Get-ChildItem $src -Include "*.ps1" -Exclude "*.Tests.ps1" -Recurse | ForEach-Ob
   }#>
 ) | ForEach-Object {
   $base = $_.Base
-  $dockerfile = $null
+  $dockerfile = If ($_.ContainsKey("Dockerfile") -and $_.Dockerfile) { $_.Dockerfile } { $null }
   $tag = $_.Tag
-
-  If ($_.ContainsKey("Dockerfile") -and $_.Dockerfile) {
-    $dockerfile = $_.Dockerfile
-  }
 
   $buildArgs = @(
     "build",
     "--build-arg", "BASEIMAGE=${base}",
-    "--build-arg", "SitecoreDevUsername=${SitecoreDevUsername}",
-    "--build-arg", "SitecoreDevPassword=${SitecoreDevPassword}"
+    # "--build-arg", "SitecoreDevUsername=${SitecoreDevUsername}",
+    # "--build-arg", "SitecoreDevPassword=${SitecoreDevPassword}"
   )
   $tag | ForEach-Object { $buildArgs += @("--tag", "${Repository}:${_}") }
   If ($dockerfile) { $buildArgs += @("--file", $dockerfile) }
