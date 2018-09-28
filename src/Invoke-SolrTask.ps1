@@ -1,5 +1,6 @@
 Function Invoke-SolrTask {
   [CmdletBinding(SupportsShouldProcess = $true)]
+  [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")]
   Param(
     [Parameter()]
     [ValidateNotNullOrEmpty()]

@@ -1,6 +1,7 @@
 Function Invoke-DownloadSitecoreTask {
   [CmdletBinding()]
   [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingPlainTextForPassword", "")]
+  [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams", "")]
   Param(
     [Parameter(Mandatory = $true, HelpMessage = "dev.sitecore.net username")]
     [ValidateNotNullOrEmpty()]
