@@ -88,7 +88,10 @@ Get-ChildItem $src -Include "*.ps1" -Exclude "*.Tests.ps1" -Recurse | ForEach-Ob
   If ($LASTEXITCODE) {
     Write-Error "Non-zero exit code ${LASTEXITCODE} while building ${tag}"
   } ElseIf ($Publish) {
-    docker push "${Repository}:${tag}"
+    $tag | ForEach-Object {
+      Write-Output "Publishing ${Repository}:${_} to docker"
+      docker push "${Repository}:${_}"
+    }
   }
 }
 
