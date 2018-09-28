@@ -2,13 +2,25 @@ version: 0.1.{build}
 image: Visual Studio 2017
 
 environment:
+  docker_username:
+    secure: helZ9wdRn6I3BRMa2WnMnw==
+  docker_password:
+    secure: e2aVeCR2p5UABsfJT0sS1A==
+  docker_organization:
+    secure: O31RyxMbW2kjUIZnmwAlI1VZ2ARwMDjWeolUMCT+nTM=
+  docker_repository:
+    secure: O31RyxMbW2kjUIZnmwAlIyGjRR7WCzzvWxCs9kL8mrg=
   license_url:
     secure: niAprUCDiG+obOLNs9BnCEaFLb3zIrGVzqg2Xn6NxudI7DoleHWlDhK6a69722jpUy1cby3iqb7hhgtG54TQLg6Eod0VMw2RZySU+cac5qsEKvwJIfUVdI/ffRVpAkblNYUrMXTfKEZ37kwHQZ47nmc1Wjdx3kC92Jdg5WinTzssxCqPZvvcNNBhGgpY3vSjxpH6bPXf31KYxJn2XnOatipXUsdAdyhUX1wauegINFB31yWR2cRpCh7sQ+/VfY1cGXwlF4gtl0VTk2yUlykdGw==
   packages_url:
     secure: niAprUCDiG+obOLNs9BnCEaFLb3zIrGVzqg2Xn6NxudI7DoleHWlDhK6a69722jp0sAZ0QYwQtlsrvGWGEqxUKDMJ/FGpzW3rOWpNs4rqOF8eLWp5o7w5aLGrQWwxohElYMvWPU2LryV2EQaLvG7zoAuK3UX+lDJfYr5xTrMRXfcp/nCG+z+z8m5cb5QeKR7JU2yPXQ4ZLeaR11hbmc1Rt8Xns5Bf2sCQzduxuv0bll1398Qh9uQYVEgG3bwZtMILy6Dxxt6r4+PktowbXj1qcdsQRTd8UBK71Y9gorDf8fer3NKEsyW2g7eTPlDJ+vocNX78K0I3aHYMlCoTK1oOQ==
+  sitecore_username:
+    secure: uLbUPi0gLKEHi8f75ysLMczdR6Sl0oU025K59LRfM6o=
+  sitecore_password:
+    secure: e2aVeCR2p5UABsfJT0sS1A==
 
 cache:
-  - resourcesfiles -> appveyor.yml
+  - resourcefiles -> appveyor.yml
 
 install:
   - ps: .\Setup.ps1
@@ -38,7 +50,12 @@ install:
         Write-Output "Extracting configuration files"
         Expand-Archive "$resx\XP0 Configuration files*.zip" -DestinationPath $resx\
       }
+  - ps: $env:docker_password | docker login --username $env:docker_username --password-stdin $env:docker_organization
 
-build: false
-#build_script:
-#  - ps: .\Build.ps1
+build_script:
+  - ps: .\Build.ps1 -Repository $env:docker_repository -SitecoreDevUsername $env:sitecore_username -SitecoreDevPassword $env:sitecore_password -Publish
+
+deploy_script:
+  - ps: |
+      
+      docker push $env:docker_repository

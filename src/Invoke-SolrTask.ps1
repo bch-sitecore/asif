@@ -1,21 +1,44 @@
 Function Invoke-SolrTask {
   [CmdletBinding(SupportsShouldProcess = $true)]
-  Param()
+  Param(
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$Hostname = "sc.local"
+    ,
+    [Parameter()]
+    [ValidateRange(1, 65535)]
+    [int]$Port = 8983
+    ,
+    [Parameter()]
+    [ValidateNotNull()]
+    [version]$Version = "6.6.2"
+    ,
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$ServiceName = "Apache Solr $($Version)"
+    ,
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$CertificateFriendlyName = "Apache Solr"
+  )
   Process {
-    $version = "6.6.2"
-    $url = "https://archive.apache.org/dist/lucene/solr/$($version)/solr-$($version).zip"
-    $outFile = Join-Path $env:TEMP -ChildPath "solr-$($version).zip"
+    Write-TaskInfo -Message $Hostname -Tag "Hostname"
+    Write-TaskInfo -Message $Port -Tag "Port"
+    Write-TaskInfo -Message $Version -Tag "Version"
+    Write-TaskInfo -Message $CertificateFriendlyName -Tag "CertificateFriendlyName"
+    
+    $url = "https://archive.apache.org/dist/lucene/solr/$($Version)/solr-$($version).zip"
+    $outFile = Join-Path $env:TEMP -ChildPath "solr-$($Version).zip"
     $installPathPattern = Join-Path $env:ProgramData -ChildPath "solr-*"
     $isInstalled = $null -ne (Get-Command "solr" -ErrorAction SilentlyContinue)
 
-    Write-TaskInfo -Message $version -Tag "version"
     Write-TaskInfo -Message $url -Tag "url"
     Write-TaskInfo -Message $outFile -Tag "outFile"
     Write-TaskInfo -Message $isInstalled -Tag "isInstalled"
     Write-TaskInfo -Message $installPathPattern -Tag "installPathPattern"
 
     If (!$isInstalled) {
-      Write-Verbose "Installing SOLR $($version)"
+      Write-Verbose "Installing SOLR $($Version)"
 
       ExpandArchive $url -OutFile $outFile -DestinationPath $env:ProgramData
 
@@ -31,79 +54,17 @@ Function Invoke-SolrTask {
       }
     } Else {
       Write-Verbose "SOLR already exists"
-      Write-TaskInfo -Message "Solr $($version)" -Tag "Exists"
+      Write-TaskInfo -Message "Solr $($Version)" -Tag "Exists"
     }
 
-    NewSolrConfig $installPath
-    NewSolrService $installPath
+    NewSolrConfig -Path $installPath -Hostname $Hostname `
+      -Port $Port -CertificateFriendlyName $CertificateFriendlyName
+    NewSolrService -Path $installPath -Hostname $Hostname `
+      -Port $Port -ServiceName $ServiceName
   }
 }
 Register-SitecoreInstallExtension -Command Invoke-SolrTask -As Solr -Type Task
 
-Function GetSolrHost {
-  [CmdletBinding()]
-  [OutputType([string])]
-  Param(
-    [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateScript({ Test-Path $_ -PathType Container })]
-    [ValidateScript({ Test-Path (Join-Path $_ -ChildPath "bin\solr.in.cmd") })]
-    [string]$Path
-    ,
-    [Parameter(Position = 1)]
-    [ValidateNotNullOrEmpty()]
-    [string]$DefaultHost = "solr.local"
-  )
-  Process {
-    $cmdFile = Join-Path $Path -ChildPath "bin\solr.in.cmd"
-    $result = $DefaultHost
-
-    If (Test-Path $cmdFile) {
-      $match = (Get-Content $cmdFile) | Select-String "^set SOLR_HOST=\w+"
-      If ($match) {
-        $result = $match -replace "set SOLR_HOST="
-      }
-    }
-
-    $result
-  }
-}
-Function GetSolrPath {
-  [OutputType([string])]
-  Param()
-  Process {
-    $solr = Get-Command "solr" -ErrorAction SilentlyContinue
-    If ($solr) {
-      Split-Path (Split-Path $solr.Source -Parent) -Parent
-    }
-  }
-}
-Function GetSolrPort {
-  [CmdletBinding()]
-  [OutputType([int])]
-  Param(
-    [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateScript({ Test-Path $_ -PathType Container })]
-    [ValidateScript({ Test-Path (Join-Path $_ -ChildPath "bin\solr.in.cmd") })]
-    [string]$Path
-    ,
-    [Parameter(Position = 1)]
-    [ValidateRange(1, 65535)]
-    [int]$DefaultPort = 8983
-  )
-  Begin {
-    $cmdFile = Join-Path $Path -ChildPath "bin\solr.in.cmd"
-    $result = $DefaultPort
-  }
-  Process {
-    If (Test-Path $cmdFile) {
-      $match = (Get-Content $cmdFile) | Select-String "^set SOLR_PORT=\d+"
-      If ($match) {
-        $result = [int]($match -replace "set SOLR_PORT=")
-      }
-    }
-    $result
-  }
-}
 Function NewSolrConfig {
   [CmdletBinding(SupportsShouldProcess = $true)]
   Param(
@@ -114,20 +75,24 @@ Function NewSolrConfig {
     ,
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string]$Hostname = "solr.local"
+    [string]$Hostname = "solr.sc"
     ,
     [Parameter()]
     [ValidateRange(1, 65535)]
     [int]$Port = 8983
+    ,
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$CertificateFriendlyName = "Apache Solr"
   )
   Process {
     Write-TaskInfo -Message $Path -Tag "NewSolrConfig.Path"
     Write-TaskInfo -Message $Hostname -Tag "NewSolrConfig.Hostname"
     Write-TaskInfo -Message $Port -Tag "NewSolrConfig.Port"
+    Write-TaskInfo -Message $CertificateFriendlyName -Tag "CertificateFriendlyName"
 
     $binPath = Join-Path $Path -ChildPath "bin"
     $serverPath = Join-Path $Path -ChildPath "server"
-    $friendlyName = "Apache Solr"
 
     $cmdFile = Join-Path $binPath -ChildPath "solr.in.cmd"
     $cmdFileOrig = Join-Path $binPath -ChildPath "solr.in.cmd.orig"
@@ -137,7 +102,6 @@ Function NewSolrConfig {
 
     Write-TaskInfo -Message $binPath -Tag "NewSolrConfig.binPath"
     Write-TaskInfo -Message $serverPath -Tag "NewSolrConfig.serverPath"
-    Write-TaskInfo -Message $friendlyName -Tag "NewSolrConfig.friendlyName"
     Write-TaskInfo -Message $cmdFile -Tag "NewSolrConfig.cmdFile"
     Write-TaskInfo -Message $cmdFileOrig -Tag "NewSolrConfig.cmdFileOrig"
     Write-TaskInfo -Message $certFile -Tag "NewSolrConfig.certFile"
@@ -149,12 +113,15 @@ Function NewSolrConfig {
     }
     If ($PSCmdlet.ShouldProcess($certFile, "Create")) {
       Write-Verbose "Creating SOLR cert '$($certFile)'"
-      $cert = GetCert -ByFriendlyName $friendlyName -CertStoreLocation "Cert:\LocalMachine\Root"
+      $cert = GetCert -ByFriendlyName $CertificateFriendlyName `
+        -CertStoreLocation "Cert:\LocalMachine\Root"
       If (!$cert) {
-        $cert = GetCert -ByFriendlyName $friendlyName -CertStoreLocation "Cert:\LocalMachine\My"
+        $cert = GetCert -ByFriendlyName $CertificateFriendlyName `
+          -CertStoreLocation "Cert:\LocalMachine\My"
         If (!$cert) {
           $cert = New-SelfSignedCertificate -CertStoreLocation "Cert:\LocalMachine\My" `
-            -DnsName $Hostname -FriendlyName $friendlyName -NotAfter (Get-Date).AddYears(2)
+            -DnsName $Hostname -FriendlyName $CertificateFriendlyName `
+            -NotAfter (Get-Date).AddYears(2)
           Write-Verbose "  created w/ Thumbprint $($cert.Thumbprint)"
           Write-TaskInfo -Message $cert.Thumbprint -Tag "NewSolrConfig.cert.Thumbprint"
         } Else {
@@ -215,15 +182,27 @@ Function NewSolrService {
     [ValidateScript({ Test-Path $_ -PathType Container })]
     [ValidateScript({ Test-Path (Join-Path $_ -ChildPath "bin\solr.in.cmd") })]
     [string]$Path
+    ,
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$Hostname = "solr.local"
+    ,
+    [Parameter()]
+    [ValidateRange(1, 65535)]
+    [int]$Port = 8983
+    ,
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$ServiceName = "Apache Solr 6.6.2"
   )
   Process {
     Write-TaskInfo -Message $Path -Tag "NewSolrService.Path"
+    Write-TaskInfo -Message $Hostname -Tag "NewSolrService.Hostname"
+    Write-TaskInfo -Message $Port -Tag "NewSolrService.Port"
+    Write-TaskInfo -Message $ServiceName -Tag "NewSolrService.ServiceName"
 
     $binPath = Join-Path $Path -ChildPath "bin"
-    $serviceName = "Apache Solr 6.6.2"
     $serviceAccount = "NT AUTHORITY\NetworkService"
-    $serviceHost = GetSolrHost $Path
-    $servicePort = GetSolrPort $Path
     $tmpPath = Join-Path $Path -ChildPath "server\tmp" # aka -Djava.io.tmpdir=
     $logsPath = Join-Path $Path -ChildPath "server\logs"
 
@@ -232,13 +211,13 @@ Function NewSolrService {
       Write-Error "NSSM must be installed and discoverable via `$env:PATH (run Install-NSSM first)"
     }
 
-    $isInstalled = $null -ne (Get-Service $serviceName -ErrorAction SilentlyContinue)
+    $isInstalled = $null -ne (Get-Service $ServiceName -ErrorAction SilentlyContinue)
   
     Write-TaskInfo -Message $binPath -Tag "NewSolrService.binPath"
     Write-TaskInfo -Message $serviceName -Tag "NewSolrService.serviceName"
     Write-TaskInfo -Message $serviceAccount -Tag "NewSolrService.serviceAccount"
-    Write-TaskInfo -Message $serviceHost -Tag "NewSolrService.serviceHost"
-    Write-TaskInfo -Message $servicePort -Tag "NewSolrService.servicePort"
+    Write-TaskInfo -Message $Hostname -Tag "NewSolrService.Hostname"
+    Write-TaskInfo -Message $Port -Tag "NewSolrService.Port"
     Write-TaskInfo -Message $tmpPath -Tag "NewSolrService.tmpPath"
     Write-TaskInfo -Message $logsPath -Tag "NewSolrService.logsPath"
     Write-TaskInfo -Message $nssm -Tag "NewSolrService.nssm"
@@ -247,23 +226,23 @@ Function NewSolrService {
       Write-Verbose "Installing Solr Service"
       If ($PSCmdlet.ShouldProcess($serviceName, "Install service")) {
 
-        $serviceCmd = "`"`"$(Join-Path $binPath -ChildPath 'solr.cmd')`"`" start -port $($servicePort) -foreground -verbose"
+        $serviceCmd = "`"`"$(Join-Path $binPath -ChildPath 'solr.cmd')`"`" start -port $($Port) -foreground -verbose"
 
-        & $nssm install $serviceName "cmd.exe" "/C $($serviceCmd) < nul" | Out-Null
-        & $nssm set $serviceName Description "Apache Solr 6.6.2 (https://$($serviceHost):$($servicePort)/solr/#)"
-        & $nssm set $serviceName AppDirectory $tmpPath
-        & $nssm set $serviceName AppStdoutCreationDisposition 2
-        & $nssm set $serviceName AppStdout (Join-Path $logsPath -ChildPath "nssm.log")
-        & $nssm set $serviceName AppStderrCreationDisposition 2
-        & $nssm set $serviceName AppStderr (Join-Path $logsPath -ChildPath "nssm.log")
-        & $nssm set $serviceName AppRotateFiles 1
-        & $nssm set $serviceName AppRotateBytes 1048576
-        & $nssm set $serviceName AppStopMethodConsole 15000
-        & $nssm set $serviceName AppExit "Default" "Exit"
-        & $nssm set $serviceName Start "SERVICE_AUTO_START"
+        & $nssm install $ServiceName "cmd.exe" "/C $($serviceCmd) < nul" | Out-Null
+        & $nssm set $ServiceName Description "Apache Solr 6.6.2 (https://$($Hostname):$($Port)/solr/#)"
+        & $nssm set $ServiceName AppDirectory $tmpPath
+        & $nssm set $ServiceName AppStdoutCreationDisposition 2
+        & $nssm set $ServiceName AppStdout (Join-Path $logsPath -ChildPath "nssm.log")
+        & $nssm set $ServiceName AppStderrCreationDisposition 2
+        & $nssm set $ServiceName AppStderr (Join-Path $logsPath -ChildPath "nssm.log")
+        & $nssm set $ServiceName AppRotateFiles 1
+        & $nssm set $ServiceName AppRotateBytes 1048576
+        & $nssm set $ServiceName AppStopMethodConsole 15000
+        & $nssm set $ServiceName AppExit "Default" "Exit"
+        & $nssm set $ServiceName Start "SERVICE_AUTO_START"
 
         # Run service under $serviceAccount
-        & sc.exe config $serviceName obj= $serviceAccount
+        & sc.exe config $ServiceName obj= $serviceAccount
 
         # Give serviceAccount Read/execute access to entire directory
         # (ObjectInherit)(ContainerInherit)Read Execute
@@ -278,8 +257,73 @@ Function NewSolrService {
 
       }
     } Else {
-      Write-Verbose "Solr Service already exists"
-      Write-TaskInfo -Message "Solr Service" -Tag "Exists"
+      Write-Verbose "$($ServiceName) already exists"
+      Write-TaskInfo -Message $ServiceName -Tag "Exists"
     }
   }
 }
+
+# Function GetSolrHost {
+#   [CmdletBinding()]
+#   [OutputType([string])]
+#   Param(
+#     [Parameter(Position = 0, Mandatory = $true)]
+#     [ValidateScript({ Test-Path $_ -PathType Container })]
+#     [ValidateScript({ Test-Path (Join-Path $_ -ChildPath "bin\solr.in.cmd") })]
+#     [string]$Path
+#     ,
+#     [Parameter(Position = 1)]
+#     [ValidateNotNullOrEmpty()]
+#     [string]$DefaultHost = "solr.local"
+#   )
+#   Process {
+#     $cmdFile = Join-Path $Path -ChildPath "bin\solr.in.cmd"
+#     $result = $DefaultHost
+
+#     If (Test-Path $cmdFile) {
+#       $match = (Get-Content $cmdFile) | Select-String "^set SOLR_HOST=\w+"
+#       If ($match) {
+#         $result = $match -replace "set SOLR_HOST="
+#       }
+#     }
+
+#     $result
+#   }
+# }
+# Function GetSolrPath {
+#   [OutputType([string])]
+#   Param()
+#   Process {
+#     $solr = Get-Command "solr" -ErrorAction SilentlyContinue
+#     If ($solr) {
+#       Split-Path (Split-Path $solr.Source -Parent) -Parent
+#     }
+#   }
+# }
+# Function GetSolrPort {
+#   [CmdletBinding()]
+#   [OutputType([int])]
+#   Param(
+#     [Parameter(Position = 0, Mandatory = $true)]
+#     [ValidateScript({ Test-Path $_ -PathType Container })]
+#     [ValidateScript({ Test-Path (Join-Path $_ -ChildPath "bin\solr.in.cmd") })]
+#     [string]$Path
+#     ,
+#     [Parameter(Position = 1)]
+#     [ValidateRange(1, 65535)]
+#     [int]$DefaultPort = 8983
+#   )
+#   Begin {
+#     $cmdFile = Join-Path $Path -ChildPath "bin\solr.in.cmd"
+#     $result = $DefaultPort
+#   }
+#   Process {
+#     If (Test-Path $cmdFile) {
+#       $match = (Get-Content $cmdFile) | Select-String "^set SOLR_PORT=\d+"
+#       If ($match) {
+#         $result = [int]($match -replace "set SOLR_PORT=")
+#       }
+#     }
+#     $result
+#   }
+# }

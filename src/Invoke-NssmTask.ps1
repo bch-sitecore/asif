@@ -1,14 +1,18 @@
 Function Invoke-NssmTask {
   [CmdletBinding(SupportsShouldProcess = $true)]
-  Param()
+  Param(
+    [Parameter()]
+    [ValidateNotNull()]
+    [version]$Version = "2.24"
+  )
   Process {
-    $version = "2.24"
-    $url = "https://nssm.cc/release/nssm-$($version).zip"
-    $outFile = Join-Path $env:TEMP -ChildPath "nssm-$($version).zip"
+    Write-TaskInfo -Message $Version -Tag "Version"
+
+    $url = "https://nssm.cc/release/nssm-$($Version).zip"
+    $outFile = Join-Path $env:TEMP -ChildPath "nssm-$($Version).zip"
     $installPathPattern = Join-Path $env:ProgramData -ChildPath "nssm-*"
     $isInstalled = $null -ne (Get-Command "nssm" -ErrorAction SilentlyContinue)
 
-    Write-TaskInfo -Message $version -Tag "version"
     Write-TaskInfo -Message $url -Tag "url"
     Write-TaskInfo -Message $outFile -Tag "outFile"
     Write-TaskInfo -Message $isInstalled -Tag "isInstalled"

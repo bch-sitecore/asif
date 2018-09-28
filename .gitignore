@@ -1,3 +1,2 @@
-dist/
-resourcefiles/*.ps1
-resourcefiles/*.json
+resourcefiles/
+license.xml

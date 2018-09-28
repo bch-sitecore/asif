@@ -1,7 +1,13 @@
 Function Invoke-SqlServerDeveloperTask {
   [CmdletBinding(SupportsShouldProcess = $true)]
-  Param()
+  Param(
+    [Parameter(Position = 0, Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$AdminPassword
+  )
   Process {
+    Write-TaskInfo -Message $AdminPassword -Tag "AdminPassword"
+
     $boxOutFile = Join-Path $env:TEMP -ChildPath "SQLServer2017-DEV-x64-ENU.box"
     $boxUrl = "https://go.microsoft.com/fwlink/?linkid=840944"
     $exeOutFile = Join-Path $env:TEMP -ChildPath "SQLServer2017-DEV-x64-ENU.exe"
@@ -97,6 +103,12 @@ Function Invoke-SqlServerDeveloperTask {
 
       Write-Verbose "Starting MSSQLSERVER service"
       Start-Service "MSSQLSERVER"
+    }
+    If ($PSCmdlet.ShouldProcess($AdminPassword, "Set SA Password")) {
+      $sqlcmd = Get-ChildItem 'C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\' -Include 'sqlcmd.exe' -Recurse |
+        Select-Object -ExpandProperty FullName -First 1
+      $sanitizedPassword = $AdminPassword -replace "'", "''"
+      & $sqlcmd -Q "ALTER LOGIN sa with password='$($sanitizedPassword)';`nGO`nALTER LOGIN sa ENABLE;`nGO"
     }
     If ($PSCmdlet.ShouldProcess("PSModule:SQLPS", "Remove")) {
       # SQLPS comes with SQL.

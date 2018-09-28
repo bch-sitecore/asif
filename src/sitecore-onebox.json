@@ -6,62 +6,90 @@
 // ------------------------------------------------------------------------- //
 {
   "Parameters": {
-    "Name": {
+    "ResourcePath": {
       "Type": "string",
-      "DefaultValue": "world",
-      "Description": "Greet the world"
+      "DefaultValue": "c:\\resourcefiles",
+      "Description": "Path where the .json files are located"
+    },
+    "LicenseFile": {
+      "Type": "string",
+      "DefaultValue": "c:\\resourcefiles\\license.xml",
+      "Description": "Path to license.xml"
+    },
+    "SitecoreDeveloperPassword": {
+      "Type": "string",
+      "Description": "Password for dev.sitecore.net"
+    },
+    "SitecoreDeveloperUsername": {
+      "Type": "string",
+      "Description": "Username for dev.sitecore.net"
+    },
+    "SitecorePrefix": {
+      "Type": "string",
+      "DefaultValue": "xp0",
+      "Description": "Prefix for various installed requirements"
+    },
+    "SolrCertFriendlyName": {
+      "Type": "string",
+      "DefaultValue": "Apache Solr",
+      "Description": "SOLR Certificate friendly name" 
+    },
+    "SolrHostname": {
+      "Type": "string",
+      "DefaultValue": "solr.sc",
+      "Description": "Hostname of the Solr server"
+    },
+    "SolrPort": {
+      "Type": "int",
+      "DefaultValue": 8983,
+      "Description": "Port of the Solr server"
+    },
+    "SolrServiceName": {
+      "Type": "string",
+      "DefaultValue": "Apache Solr 6.6.2",
+      "Description": "Name of the Solr service"
+    },
+    "SolrVersion": {
+      "Type": "version",
+      "DefaultValue": "6.6.2",
+      "Description": "Solr version to install"
+    },
+    "SqlServer": {
+      "Type": "string",
+      "DefaultValue": "localhost",
+      "Description": "Address of SQL server"
+    },
+    "SqlAdminUsername": {
+      "Type": "string",
+      "DefaultValue": "sa",
+      "Description": "Login username for the SQL server"
+    },
+    "SqlAdminPassword": {
+      "Type": "string",
+      "DefaultValue": "PublicPW2018",
+      "Description": "Login password for the SQL server"
     }
   },
   "Variables": {
+    "SitecoreSiteName": "[concat(parameter('SitecorePrefix'), '.sc')]",
+    "SolrServerUrl": "[concat('https://', parameter('SolrHostname'), ':', parameter('SolrPort'), '/solr')]",
+    "XConnectCollectionService": "[concat(parameter('SitecorePrefix'), '.xconnect')]"
   },
   "Tasks": {
-    "InstallSqlServer": {
-      "Type": "SqlServerDeveloper",
-      "Params": {}
-    },
-    "InstallSqlContainedDbAuth": {
-      "Type": "SqlContainedDbAuth",
-      "Params": {}
-    },
-    "InstallJavaRuntimeEnvironment": {
-      "Type": "JavaSE8",
-      "Params": {}
-    },
-    "InstallNssm": {
-      "Type": "NSSM",
-      "Params": {}
-    },
-    "InstallSolr": {
-      "Type": "SOLR",
-      "Params": {}
-    },
-    "InstallWebServer": {
-      "Type": "WebServer",
-      "Params": {}
-    },
-    "InstallWebDeployModule": {
-      "Type": "WebDeployModule",
-      "Params": {}
-    },
-    "InstallURLRewriteModule": {
-      "Type": "URLRewriteModule",
-      "Params": {}
-    },
-    "InstallVC2015Redist": {
-      "Type": "VC15Redist",
-      "Params": {}
-    },
-    //"InstallVC2017Redist": {
-    //  "Type": "VC17Redist",
-    //  "Params": {}
-    //},
-    "InstallSQLSysClrTypes": {
-      "Type": "SQLSysClrTypes",
-      "Params": {}
-    },
-    "InstallDacFx": {
-      "Type": "DacFx",
-      "Params": {}
+    "InstallSitecoreXp0": {
+      "Type": "SitecoreXP0",
+      "Params": {
+        "ResourcePath": "[parameter('ResourcePath')]",
+        "LicenseFile": "[parameter('LicenseFile')]",
+        "Prefix": "[parameter('SitecorePrefix')]",
+        "SitecoreSiteName": "[variable('SitecoreSiteName')]",
+        "SolrServerUrl": "[variable('SolrServerUrl')]",
+        "SolrServiceName": "[parameter('SolrServiceName')]",
+        "SqlServerInstance": "[parameter('SqlServer')]",
+        "SqlAdminUsername": "[parameter('SqlAdminUsername')]",
+        "SqlAdminPassword": "[parameter('SqlAdminPassword')]",
+        "XConnectCollectionService": "[variable('XConnectCollectionService')]"
+      }
     }
   },
   "Modules": [
