@@ -3,9 +3,9 @@ image: Visual Studio 2017
 
 environment:
   docker_username:
-    secure: helZ9wdRn6I3BRMa2WnMnw==
+    secure: b2cKuN3mLck9vm84qOfC9g==
   docker_password:
-    secure: e2aVeCR2p5UABsfJT0sS1A==
+    secure: zK3mBk7glxDZuCKBHGINOQ1BRWJiaOUA+3bEWjT1Bk/QPfz/jWVQF6IS/n5KuoVe
   docker_organization:
     secure: O31RyxMbW2kjUIZnmwAlI1VZ2ARwMDjWeolUMCT+nTM=
   docker_repository:
@@ -50,12 +50,9 @@ install:
         Write-Output "Extracting configuration files"
         Expand-Archive "$resx\XP0 Configuration files*.zip" -DestinationPath $resx\
       }
-  - ps: $env:docker_password | docker login --username $env:docker_username --password-stdin $env:docker_organization
 
 build_script:
-  - ps: .\Build.ps1 -Repository $env:docker_repository -SitecoreDevUsername $env:sitecore_username -SitecoreDevPassword $env:sitecore_password -Publish
-
-deploy_script:
   - ps: |
-      
-      docker push $env:docker_repository
+      $env:docker_password | docker login --username $env:docker_username --password-stdin $env:docker_organization
+      .\Build.ps1 -SitecoreDevUsername $env:sitecore_username -SitecoreDevPassword $env:sitecore_password `
+        -Repository $env:docker_repository -Publish
