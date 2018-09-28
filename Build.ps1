@@ -73,12 +73,10 @@ Get-ChildItem $src -Include "*.ps1" -Exclude "*.Tests.ps1" -Recurse | ForEach-Ob
   $dockerfile = If ($_.ContainsKey("Dockerfile") -and $_.Dockerfile) { $_.Dockerfile } { $null }
   $tag = $_.Tag
 
-  $buildArgs = @(
-    "build",
-    "--build-arg", "BASEIMAGE=${base}",
-    # "--build-arg", "SitecoreDevUsername=${SitecoreDevUsername}",
-    # "--build-arg", "SitecoreDevPassword=${SitecoreDevPassword}"
-  )
+  $buildArgs = @("build")
+  $buildArgs += @("--build-arg", "BASEIMAGE=${base}")
+  # $buildArgs += @("--build-arg", "SitecoreDevUsername=${SitecoreDevUsername}")
+  # $buildArgs += @("--build-arg", "SitecoreDevPassword=${SitecoreDevPassword}")
   $tag | ForEach-Object { $buildArgs += @("--tag", "${Repository}:${_}") }
   If ($dockerfile) { $buildArgs += @("--file", $dockerfile) }
   $buildArgs += "."
