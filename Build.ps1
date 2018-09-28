@@ -55,7 +55,8 @@ $builds = @()
 If (Test-Path env:APPVEYOR) {
   # It takes ~20 minutes for AV to pull a microsoft/aspnet image. AV has a cached
   # version (w/ digest below) so we're going to try to use that. :fingers_crossed:
-  $appveyorBase = 'microsoft/aspnet@sha256:7cdafe834e1c08ed880cd54183ba33d4760c8b19e651ef1cbff0cf3118684e88'
+  # @sha256:7cdafe834e1c08ed880cd54183ba33d4760c8b19e651ef1cbff0cf3118684e88
+  $appveyorBase = 'microsoft/aspnet:latest'
   $builds += @{
     Base = $appveyorBase
     Tag = @("sc90u2-aspnet", "appveyor")
