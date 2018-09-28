@@ -16,7 +16,7 @@ Param(
   [string]$Uri
   ,
   [Parameter(Position = 4, Mandatory = $true, HelpMessage = "Destination path for packages")]
-  [ValidateScript({ Test-Path $_ -PathType Container })]
+  [ValidateNotNullOrEmpty()]
   [string]$OutFile
   ,
   [Parameter(HelpMessage = "Allow overwrite of exiting files")]
