@@ -30,7 +30,7 @@ install:
       }
       If (!(Test-Path "$resx\license.xml")) {
         Write-Output "Downloading license"
-        Invoke-WebRequest $env:license_url -OutFile "$resc\license.xml"
+        Invoke-WebRequest $env:license_url -OutFile "$resx\license.xml"
       }
       If (!(Test-Path "$resx\Sitecore*(WDP XP0 packages).zip")) {
         Write-Output "Downloading packages"
