@@ -11,7 +11,7 @@ environment:
   docker_repository:
     secure: O31RyxMbW2kjUIZnmwAlIyGjRR7WCzzvWxCs9kL8mrg=
   license_url:
-    secure: niAprUCDiG+obOLNs9BnCEaFLb3zIrGVzqg2Xn6NxudI7DoleHWlDhK6a69722jpUy1cby3iqb7hhgtG54TQLg6Eod0VMw2RZySU+cac5qsEKvwJIfUVdI/ffRVpAkblNYUrMXTfKEZ37kwHQZ47nmc1Wjdx3kC92Jdg5WinTzssxCqPZvvcNNBhGgpY3vSjxpH6bPXf31KYxJn2XnOatipXUsdAdyhUX1wauegINFB31yWR2cRpCh7sQ+/VfY1cGXwlF4gtl0VTk2yUlykdGw==
+    secure: niAprUCDiG+obOLNs9BnCEaFLb3zIrGVzqg2Xn6NxudI7DoleHWlDhK6a69722jpUy1cby3iqb7hhgtG54TQLsc0DpvSPSklZ6GUBLUcSXPeM2a0aRVG5dC2nlEl/4Pxo2817iQM8uMuLm1l43KtNM5gZxHFEkNZyWjIyJjYiAG6D+4jb1r3VkXLMfJXv6j1J3j74cGFY684FwZlB3bFkW0Y4kafbOvc5gJlQMNZUddxU3K9rt1Dc5KIZEGg4oPpAfAJA0ivYWGFNWfQJujeXw==
   sitecore_username:
     secure: uLbUPi0gLKEHi8f75ysLMczdR6Sl0oU025K59LRfM6o=
   sitecore_password:
@@ -51,6 +51,7 @@ install:
         Write-Output "Extracting configuration files"
         Expand-Archive "$resx\XP0 Configuration files*.zip" -DestinationPath $resx\
       }
+      dir $resx
 
 build_script:
   - ps: |
