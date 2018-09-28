@@ -8,6 +8,9 @@ Write-Output "Server version ${osVersion}"
 $psVersion = $PSVersionTable.PSVersion
 Write-Output "PowerShell version ${psVersion}"
 
+docker version
+docker images microsoft/aspnet --digests
+
 Write-Output "Updating NuGet package provider"
 Install-PackageProvider -Name "NuGet" -Force
 
