@@ -51,24 +51,36 @@ Get-ChildItem $src -Include "*.ps1" -Exclude "*.Tests.ps1" -Recurse | ForEach-Ob
   Get-Content $script | Add-Content $output
 }
 
-@(
-  @{
+$builds = @()
+If (Test-Path env:APPVYOR) {
+  # It takes ~20 minutes for AV to pull a microsoft/aspnet image. AV has a cached
+  # version (w/ digest below) so we're going to try to use that. :fingers_crossed:
+  $appveyorBase = 'microsoft/aspnet@sha256:7cdafe834e1c08ed880cd54183ba33d4760c8b19e651ef1cbff0cf3118684e88'
+  $builds += @{
+    Base = $appveyorBase
+    Tag = @("sc90u2-aspnet", "appveyor")
+  }
+} Else {
+  $builds += @{
     Base = "microsoft/aspnet:4.6.2"
-    Tag = @("sc90u2-aspnet4.6.2", "latest")
+    Tag = @("sc90u2-aspnet4.6.2")
   }
-  <#@{
-    Base = "microsoft/aspnet:4.7"
-    Tag = @("sc90u2-aspnet4.7")
-  }
-  @{
-    Base = "microsoft/aspnet:4.7.1"
-    Tag = @("sc90u2-aspnet4.7.1")
-  }
-  @{
-    Base = "microsoft/aspnet:4.7.2"
-    Tag = @("sc90u2-aspnet4.7.2", "latest")
-  }#>
-) | ForEach-Object {
+  # $builds += @{
+  #   Base = "microsoft/aspnet:4.7"
+  #   Tag = @("sc90u2-aspnet4.7")
+  # }
+  # $builds += @{
+  #   Base = "microsoft/aspnet:4.7.1"
+  #   Tag = @("sc90u2-aspnet4.7.1")
+  # }
+  # $builds += @{
+  #   Base = "microsoft/aspnet:4.7.2"
+  #   Tag = @("sc90u2-aspnet4.7.2", "latest")
+  # }
+}
+($builds | Select-Object -Last 1).Tags += "latest"
+
+$builds | ForEach-Object {
   $base = $_.Base
   $dockerfile = If ($_.ContainsKey("Dockerfile") -and $_.Dockerfile) { $_.Dockerfile } { $null }
   $tag = $_.Tag
