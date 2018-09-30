@@ -45,16 +45,14 @@ Function Invoke-JavaSE8Task {
         }
 
         $jreVersion = Get-ChildItem "HKLM:\SOFTWARE\JavaSoft\Java Runtime Environment" | Select-Object -ExpandProperty pschildname -Last 1
-        Write-TaskInfo $jreVersion -Tag "Version"
+        Write-TaskInfo -Message $jreVersion -Tag "Version"
 
         $env:JAVA_HOME = Convert-Path (Join-Path $env:ProgramFiles -ChildPath "Java\jre*")
-        Write-Verbose "Setting '$($env:JAVA_HOME)' as `$env:JAVA_HOME"
         [System.Environment]::SetEnvironmentVariable("JAVA_HOME", $env:JAVA_HOME, [System.EnvironmentVariableTarget]::Machine)
-        Write-TaskInfo $env:JAVA_HOME -Tag "env:JAVA_HOME"
+        Write-TaskInfo -Message $env:JAVA_HOME -Tag "env:JAVA_HOME"
 
         $javaBin = Join-Path $env:JAVA_HOME -ChildPath "bin"
-        Write-Verbose "Adding '$($javaBin)' to `$env:PATH"
-        Write-TaskInfo $javaBin -Tag "javaBin"
+        Write-TaskInfo -Message $javaBin -Tag "javaBin"
         AddPath $javaBin
       }
     } Else {

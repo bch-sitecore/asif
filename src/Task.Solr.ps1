@@ -206,6 +206,7 @@ Function NewSolrService {
     $serviceAccount = "NT AUTHORITY\NetworkService"
     $tmpPath = Join-Path $Path -ChildPath "server\tmp" # aka -Djava.io.tmpdir=
     $logsPath = Join-Path $Path -ChildPath "server\logs"
+    $solrPath = Join-Path $Path -ChildPath "Server\solr"
 
     $nssm = (Get-Command "nssm.exe" -ErrorAction SilentlyContinue).Source
     If (!$nssm) {
@@ -249,7 +250,7 @@ Function NewSolrService {
         # (ObjectInherit)(ContainerInherit)Read Execute
         & icacls.exe $Path /grant "$($serviceAccount):(OI)(CI)RX"
 
-        @($tmpPath, $logsPath) | ForEach-Object {
+        @($tmpPath, $logsPath, $solrPath) | ForEach-Object {
           If (!(Test-Path $_)) {
             New-Item $_ -ItemType Directory | Out-Null
           }
@@ -263,68 +264,3 @@ Function NewSolrService {
     }
   }
 }
-
-# Function GetSolrHost {
-#   [CmdletBinding()]
-#   [OutputType([string])]
-#   Param(
-#     [Parameter(Position = 0, Mandatory = $true)]
-#     [ValidateScript({ Test-Path $_ -PathType Container })]
-#     [ValidateScript({ Test-Path (Join-Path $_ -ChildPath "bin\solr.in.cmd") })]
-#     [string]$Path
-#     ,
-#     [Parameter(Position = 1)]
-#     [ValidateNotNullOrEmpty()]
-#     [string]$DefaultHost = "solr.local"
-#   )
-#   Process {
-#     $cmdFile = Join-Path $Path -ChildPath "bin\solr.in.cmd"
-#     $result = $DefaultHost
-
-#     If (Test-Path $cmdFile) {
-#       $match = (Get-Content $cmdFile) | Select-String "^set SOLR_HOST=\w+"
-#       If ($match) {
-#         $result = $match -replace "set SOLR_HOST="
-#       }
-#     }
-
-#     $result
-#   }
-# }
-# Function GetSolrPath {
-#   [OutputType([string])]
-#   Param()
-#   Process {
-#     $solr = Get-Command "solr" -ErrorAction SilentlyContinue
-#     If ($solr) {
-#       Split-Path (Split-Path $solr.Source -Parent) -Parent
-#     }
-#   }
-# }
-# Function GetSolrPort {
-#   [CmdletBinding()]
-#   [OutputType([int])]
-#   Param(
-#     [Parameter(Position = 0, Mandatory = $true)]
-#     [ValidateScript({ Test-Path $_ -PathType Container })]
-#     [ValidateScript({ Test-Path (Join-Path $_ -ChildPath "bin\solr.in.cmd") })]
-#     [string]$Path
-#     ,
-#     [Parameter(Position = 1)]
-#     [ValidateRange(1, 65535)]
-#     [int]$DefaultPort = 8983
-#   )
-#   Begin {
-#     $cmdFile = Join-Path $Path -ChildPath "bin\solr.in.cmd"
-#     $result = $DefaultPort
-#   }
-#   Process {
-#     If (Test-Path $cmdFile) {
-#       $match = (Get-Content $cmdFile) | Select-String "^set SOLR_PORT=\d+"
-#       If ($match) {
-#         $result = [int]($match -replace "set SOLR_PORT=")
-#       }
-#     }
-#     $result
-#   }
-# }

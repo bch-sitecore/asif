@@ -1,11 +1,13 @@
 .git/
+layered/
 src/
 .gitattributes
 .gitignore
+About.ps1
 appveyor.yml
-Build.ps1
+Build*.ps1
 Dockerfile
+Install.ps1
 LICENSE
 README.MD
-Setup.ps1
 TestResults.xml

@@ -100,7 +100,7 @@ Function Invoke-SitecoreXP0Task {
         SqlReferenceDataPassword = $SqlAdminPassword
       }
       # TODO: Find out why Invoke-ManageSolrSchemaTask is failing...
-      Install-SitecoreConfiguration @xconnectParams -Verbose -ErrorAction Continue
+      Install-SitecoreConfiguration @xconnectParams -Skip "ConfigureSolrSchemas"
     }
 
     #install solr cores for sitecore

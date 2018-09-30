@@ -14,12 +14,12 @@ Function Invoke-DacFxTask {
     $outFile64 = Join-Path $env:Temp -ChildPath "DacFramework.x64.msi"
 
     If ($PSCmdlet.ShouldProcess("SQLSysClrTypes (x86)", "Install")) {
-      Write-Verbose "Installing SQLSysClrTypes (x86)"
+      Write-TaskInfo -Message "Installing SQLSysClrTypes" -Tag "x86"
       InstallMsi $url32 -OutFile $outFile32
     }
     If ($is64) {
       If ($PSCmdlet.ShouldProcess("SQLSysClrTypes (x64)", "Install")) {
-        Write-Verbose "Installing SQLSysClrTypes (x64)"
+        Write-TaskInfo -Message "Installing SQLSysClrTypes" -Tag "x64"
         InstallMsi $url64 -OutFile $outFile64
       }
     }
